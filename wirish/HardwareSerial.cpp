@@ -88,7 +88,7 @@ static void disable_timer_if_necessary(timer_dev *dev, uint8 ch) {
 #warning "Unsupported STM32 series; timer conflicts are possible"
 #endif
 
-void HardwareSerial::begin(uint32 baud) {
+void HardwareSerial::begin1(uint32 baud, uint32 config) {
     ASSERT(baud <= this->usart_device->max_baud);
 
     if (baud > this->usart_device->max_baud) {
@@ -106,7 +106,11 @@ void HardwareSerial::begin(uint32 baud) {
                              0);
     usart_init(this->usart_device);
     usart_set_baud_rate(this->usart_device, USART_USE_PCLK, baud);
-    usart_enable(this->usart_device);
+    usart_enable1(this->usart_device, config);
+};
+
+void HardwareSerial::begin(uint32 baud) {
+    begin1(baud, SERIAL_8N1);
 }
 
 void HardwareSerial::end(void) {
