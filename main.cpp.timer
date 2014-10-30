@@ -1,0 +1,99 @@
+// Sample main.cpp file. Blinks the built-in LED, sends a message out
+// USART2, and turns on PWM on pin 2.
+
+#include <wirish/wirish.h>
+
+#define PWM_PIN  2
+
+#include <stdio.h>
+
+uint32_t i=1;
+uint32_t t=1;
+
+HardwareTimer timer(1);
+
+
+void handler_led(void) {
+    if (t & 1) {
+        GPIOA->regs->BSRR = 1 << 5 << 16;
+    } else {
+        GPIOA->regs->BSRR = 1 << 5;
+    };
+    t++;
+}
+void print_ul(const char *name, uint32_t data) {
+    char buf[20];
+    sprintf(buf, "0x%8X", (unsigned int)data);
+    Serial2.print(name);
+    Serial2.print('=');
+    Serial2.print(buf);
+    Serial2.println();
+};
+
+
+
+#define LED_RATE 20000    // in microseconds; should give 0.5Hz toggles
+void setup() {
+    /* Set up the LED to blink  */
+    pinMode(BOARD_LED_PIN, OUTPUT);
+
+    while(1) {
+        GPIOA->regs->BSRR = 1 << 5 << 16;
+        GPIOA->regs->BSRR = 1 << 5;
+    };
+
+
+    /* Send a message out USART2  */
+    Serial2.begin(115200);
+    Serial2.println("Hello world!");
+
+    timer.pause();
+    // Set up period
+    timer.setPeriod(LED_RATE); // in microseconds
+    // Set up an interrupt on channel 1
+    timer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+    timer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
+    timer.attachCompare1Interrupt(handler_led);
+
+    // Refresh the timer's count, prescale, and overflow
+    timer.refresh();
+
+    // Start the timer counting
+    timer.resume();
+
+}
+
+void loop() {
+    /* Send a message out the usb virtual serial port  */
+    Serial2.print('[');
+    Serial2.print(i); i++;
+    Serial2.print(']');
+    Serial2.println("GPIOA:");
+    
+    print_ul("CRL ", GPIOA->regs->CRL);
+    print_ul("CRH ", GPIOA->regs->CRH);
+    print_ul("IDR ", GPIOA->regs->IDR);
+    print_ul("ODR ", GPIOA->regs->ODR);
+    print_ul("BSRR", GPIOA->regs->BSRR);
+    print_ul("BRR ", GPIOA->regs->BRR);
+    print_ul("LCKR", GPIOA->regs->LCKR);
+
+
+    delay(1000);
+}
+
+// Force init to be called *first*, i.e. before static object allocation.
+// Otherwise, statically allocated objects that need libmaple may fail.
+__attribute__((constructor)) void premain() {
+    init();
+}
+
+int main(void) {
+    setup();
+
+    while (true) {
+        loop();
+    }
+
+    return 0;
+}

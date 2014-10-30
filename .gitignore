@@ -8,5 +8,6 @@ TAGS
 *~
 *.swp
 arm
+.DS_Store
 cscope*
 .gdbinit
