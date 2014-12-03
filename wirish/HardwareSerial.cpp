@@ -87,7 +87,7 @@ static void disable_timer_if_necessary(timer_dev *dev, uint8 ch) {
 #else
 #warning "Unsupported STM32 series; timer conflicts are possible"
 #endif
-
+#include <wirish/usb_serial.h>
 void HardwareSerial::begin1(uint32 baud, uint32 config) {
     ASSERT(baud <= this->usart_device->max_baud);
 
@@ -107,6 +107,8 @@ void HardwareSerial::begin1(uint32 baud, uint32 config) {
     usart_init(this->usart_device);
     usart_set_baud_rate(this->usart_device, USART_USE_PCLK, baud);
     usart_enable1(this->usart_device, config);
+
+    usart_reg_map *regs = this->usart_device->regs;
 };
 
 void HardwareSerial::begin(uint32 baud) {

@@ -63,16 +63,19 @@ static const spi_pins board_spi_pins[] __FLASH__ = {
      BOARD_SPI1_SCK_PIN,
      BOARD_SPI1_MISO_PIN,
      BOARD_SPI1_MOSI_PIN},
+#if BOARD_NR_SPIS > 1
     {BOARD_SPI2_NSS_PIN,
      BOARD_SPI2_SCK_PIN,
      BOARD_SPI2_MISO_PIN,
      BOARD_SPI2_MOSI_PIN},
+#endif
 #ifdef STM32_HIGH_DENSITY
     {BOARD_SPI3_NSS_PIN,
      BOARD_SPI3_SCK_PIN,
      BOARD_SPI3_MISO_PIN,
      BOARD_SPI3_MOSI_PIN},
 #endif
+
 };
 
 
