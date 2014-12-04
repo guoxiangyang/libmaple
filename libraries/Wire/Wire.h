@@ -47,8 +47,8 @@
  * On the Maple, let the default pins be in the same location as the Arduino
  * pins
  */
-#define SDA 19
-#define SCL 20
+#define SDA 20
+#define SCL 19
 
 //#define I2C_DELAY(x) {uint32 time=micros(); while(time>(micros()+x));}
 #define I2C_DELAY(x) do{for(int i=0;i<x;i++) {asm volatile("nop");}}while(0)
