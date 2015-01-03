@@ -40,7 +40,7 @@ cppSRCS_$(d) +=	wirish_shift.cpp
 cppSRCS_$(d) +=	wirish_time.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/boards_setup.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/wirish_digital.cpp
-cppSRCS_$(d) += $(MCU_SERIES)/wirish_debug.cpp
+# cppSRCS_$(d) += $(MCU_SERIES)/wirish_debug.cpp
 cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
 
 sFILES_$(d)   := $(sSRCS_$(d):%=$(d)/%)

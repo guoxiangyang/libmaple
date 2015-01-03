@@ -17,7 +17,7 @@ cSRCS_$(d) := adc.c
 cSRCS_$(d) += exti.c
 cSRCS_$(d) += flash.c
 cSRCS_$(d) += gpio.c
-# cSRCS_$(d) += iwdg.c
+cSRCS_$(d) += iwdg.c
 cSRCS_$(d) += nvic.c
 cSRCS_$(d) += pwr.c
 cSRCS_$(d) += rcc.c
@@ -30,7 +30,7 @@ cSRCS_$(d) += util.c
 sSRCS_$(d) := exc.S
 # I2C support must be ported to F2:
 ifeq ($(MCU_SERIES),stm32f1)
-cSRCS_$(d) += i2c.c
+# cSRCS_$(d) += i2c.c
 endif
 
 cFILES_$(d) := $(cSRCS_$(d):%=$(d)/%)

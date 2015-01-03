@@ -235,7 +235,6 @@ int32 i2c_master_xfer(i2c_dev *dev,
 
     i2c_enable_irq(dev, I2C_IRQ_EVENT);
     i2c_start_condition(dev);
-
     rc = wait_for_state_change(dev, I2C_STATE_XFER_DONE, timeout);
     if (rc < 0) {
         goto out;
