@@ -86,14 +86,14 @@ static const spi_pins board_spi_pins[] __FLASH__ = {
 HardwareSPI::HardwareSPI(uint32 spi_num) {
     switch (spi_num) {
     case 1:
-        this->spi_d = SPI1;
+        this->dev = SPI1;
         break;
     case 2:
-        this->spi_d = SPI2;
+        this->dev = SPI2;
         break;
 #ifdef STM32_HIGH_DENSITY
     case 3:
-        this->spi_d = SPI3;
+        this->dev = SPI3;
         break;
 #endif
     default:
@@ -112,7 +112,7 @@ void HardwareSPI::begin(SPIFrequency frequency, uint32 bitOrder, uint32 mode) {
     }
     spi_cfg_flag end = bitOrder == MSBFIRST ? SPI_FRAME_MSB : SPI_FRAME_LSB;
     spi_mode m = (spi_mode)mode;
-    enable_device(this->spi_d, true, frequency, end, m);
+    enable_device(this->dev, true, frequency, end, m);
 }
 
 void HardwareSPI::begin(void) {
@@ -126,7 +126,7 @@ void HardwareSPI::beginSlave(uint32 bitOrder, uint32 mode) {
     }
     spi_cfg_flag end = bitOrder == MSBFIRST ? SPI_FRAME_MSB : SPI_FRAME_LSB;
     spi_mode m = (spi_mode)mode;
-    enable_device(this->spi_d, false, (SPIFrequency)0, end, m);
+    enable_device(this->dev, false, (SPIFrequency)0, end, m);
 }
 
 void HardwareSPI::beginSlave(void) {
@@ -134,21 +134,29 @@ void HardwareSPI::beginSlave(void) {
 }
 
 void HardwareSPI::end(void) {
-    if (!spi_is_enabled(this->spi_d)) {
+    if (!spi_is_enabled(this->dev)) {
         return;
     }
 
     // Follows RM0008's sequence for disabling a SPI in master/slave
     // full duplex mode.
-    while (spi_is_rx_nonempty(this->spi_d)) {
+    while (spi_is_rx_nonempty(this->dev)) {
         // FIXME [0.1.0] remove this once you have an interrupt based driver
-        volatile uint16 rx __attribute__((unused)) = spi_rx_reg(this->spi_d);
+        volatile uint16 rx __attribute__((unused)) = spi_rx_reg(this->dev);
     }
-    while (!spi_is_tx_empty(this->spi_d))
+    while (!spi_is_tx_empty(this->dev))
         ;
-    while (spi_is_busy(this->spi_d))
+    while (spi_is_busy(this->dev))
         ;
-    spi_peripheral_disable(this->spi_d);
+    spi_peripheral_disable(this->dev);
+}
+
+void HardwareSPI::attachInterrupt(voidFuncPtr handler) {
+    spi_attach_interrupt(this->dev, handler);
+}
+
+void HardwareSPI::detachInterrupt() {
+    spi_detach_interrupt(this->dev);
 }
 
 /*
@@ -164,9 +172,9 @@ uint8 HardwareSPI::read(void) {
 void HardwareSPI::read(uint8 *buf, uint32 len) {
     uint32 rxed = 0;
     while (rxed < len) {
-        while (!spi_is_rx_nonempty(this->spi_d))
+        while (!spi_is_rx_nonempty(this->dev))
             ;
-        buf[rxed++] = (uint8)spi_rx_reg(this->spi_d);
+        buf[rxed++] = (uint8)spi_rx_reg(this->dev);
     }
 }
 
@@ -177,7 +185,7 @@ void HardwareSPI::write(uint8 byte) {
 void HardwareSPI::write(const uint8 *data, uint32 length) {
     uint32 txed = 0;
     while (txed < length) {
-        txed += spi_tx(this->spi_d, data + txed, length - txed);
+        txed += spi_tx(this->dev, data + txed, length - txed);
     }
 }
 
@@ -191,19 +199,19 @@ uint8 HardwareSPI::transfer(uint8 byte) {
  */
 
 uint8 HardwareSPI::misoPin(void) {
-    return dev_to_spi_pins(this->spi_d)->miso;
+    return dev_to_spi_pins(this->dev)->miso;
 }
 
 uint8 HardwareSPI::mosiPin(void) {
-    return dev_to_spi_pins(this->spi_d)->mosi;
+    return dev_to_spi_pins(this->dev)->mosi;
 }
 
 uint8 HardwareSPI::sckPin(void) {
-    return dev_to_spi_pins(this->spi_d)->sck;
+    return dev_to_spi_pins(this->dev)->sck;
 }
 
 uint8 HardwareSPI::nssPin(void) {
-    return dev_to_spi_pins(this->spi_d)->nss;
+    return dev_to_spi_pins(this->dev)->nss;
 }
 
 /*

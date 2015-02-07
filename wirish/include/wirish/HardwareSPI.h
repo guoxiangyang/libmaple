@@ -111,6 +111,9 @@ public:
      */
     void end(void);
 
+    void attachInterrupt(voidFuncPtr handler);
+    void detachInterrupt();
+
     /*
      * I/O
      */
@@ -185,7 +188,7 @@ public:
      * @brief Get a pointer to the underlying libmaple spi_dev for
      *        this HardwareSPI instance.
      */
-    spi_dev* c_dev(void) { return this->spi_d; }
+    spi_dev* c_dev(void) { return this->dev; }
 
     /* -- The following methods are deprecated --------------------------- */
 
@@ -219,7 +222,7 @@ public:
      */
     uint8 recv(void);
 private:
-    spi_dev *spi_d;
+    spi_dev *dev;
 };
 
 #endif

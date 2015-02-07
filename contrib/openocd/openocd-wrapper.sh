@@ -13,4 +13,4 @@ OPENOCD_VERSION=`openocd -v 2>&1 | head -n1 | \
 
 CFG_FILE=$1_${OPENOCD_VERSION}.cfg
 
-openocd -f support/openocd/$CFG_FILE
+openocd -f $CFG_FILE

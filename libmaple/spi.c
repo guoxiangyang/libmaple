@@ -50,6 +50,41 @@ void spi_init(spi_dev *dev) {
     rcc_reset_dev(dev->clk_id);
 }
 
+static inline void spi_enable_irq(spi_dev *dev) {
+    /* if (dev->type == TIMER_ADVANCED) { */
+    /*     enable_adv_irq(dev, iid); */
+    /* } else { */
+    /*     enable_bas_gen_irq(dev); */
+    /* } */
+}
+
+static inline void spi_disable_irq(spi_dev *dev) {
+    /* *bb_perip(&(dev->regs).adv->DIER, interrupt) = 0; */
+}
+
+
+/**
+ * @brief Attach a spi interrupt.
+ * @param dev Spi device
+ * @param handler Handler to attach to the given interrupt.
+ */
+void spi_attach_interrupt(spi_dev *dev,
+                            voidFuncPtr handler) {
+    dev->handler = handler;
+    spi_enable_irq(dev);
+}
+
+
+/**
+ * @brief Detach a spi interrupt.
+ * @param dev Spi device
+ */
+void spi_detach_interrupt(spi_dev *dev) {
+    spi_disable_irq(dev);
+    dev->handler = NULL;
+}
+
+
 /**
  * @brief Configure and enable a SPI device as bus master.
  *

@@ -53,6 +53,20 @@ spi_dev *SPI3 = &spi3;
 /*
  * Routines
  */
+void __irq_spi1(void) {
+    dispatch_general(&spi1);
+}
+void __irq_spi2(void) {
+    dispatch_general(&spi2);
+}
+
+
+#if defined(STM32_HIGH_DENSITY) || defined(STM32_XL_DENSITY)
+void __irq_spi2(void) {
+    dispatch_general(&spi3);
+}
+
+#endif
 
 void spi_config_gpios(spi_dev *ignored,
                       uint8 as_master,
