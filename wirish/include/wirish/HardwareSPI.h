@@ -221,8 +221,8 @@ public:
      * @see HardwareSPI::read()
      */
     uint8 recv(void);
-private:
     spi_dev *dev;
+private:
 };
 
 #endif

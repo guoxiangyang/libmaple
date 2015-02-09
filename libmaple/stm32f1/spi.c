@@ -33,6 +33,7 @@
 
 #include <libmaple/spi.h>
 #include <libmaple/gpio.h>
+#include <libmaple/iwdg.h>
 #include "spi_private.h"
 
 /*

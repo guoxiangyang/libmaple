@@ -50,16 +50,24 @@ void spi_init(spi_dev *dev) {
     rcc_reset_dev(dev->clk_id);
 }
 
-static inline void spi_enable_irq(spi_dev *dev) {
-    /* if (dev->type == TIMER_ADVANCED) { */
-    /*     enable_adv_irq(dev, iid); */
-    /* } else { */
-    /*     enable_bas_gen_irq(dev); */
-    /* } */
+static inline void spi_enable_irq(spi_dev *dev ) {
+    nvic_irq_enable(dev->irq_num);
+    /* uint32 flags = 0; */
+    /* uint32 flags = 1 << SPI_CR2_TXEIE_BIT; */
+    /*     /\* | 1 << SPI_CR2_RXNEIE_BIT *\/ */
+    /*     /\* | 1 << SPI_CR2_ERRIE_BIT; *\/ */
+
+    /* dev->regs->CR2 = dev->regs->CR2 | flags; */
+    dev->regs->CR2 = 0x20;
 }
 
 static inline void spi_disable_irq(spi_dev *dev) {
-    /* *bb_perip(&(dev->regs).adv->DIER, interrupt) = 0; */
+    nvic_irq_disable(dev->irq_num);
+    uint32 flags = 1 << SPI_CR2_TXEIE_BIT
+        | 1 << SPI_CR2_RXNEIE_BIT
+        | 1 << SPI_CR2_ERRIE_BIT;
+    flags = ~flags;
+    dev->regs->CR2 = dev->regs->CR2 & flags;
 }
 
 
@@ -68,8 +76,7 @@ static inline void spi_disable_irq(spi_dev *dev) {
  * @param dev Spi device
  * @param handler Handler to attach to the given interrupt.
  */
-void spi_attach_interrupt(spi_dev *dev,
-                            voidFuncPtr handler) {
+void spi_attach_interrupt(spi_dev *dev, voidFuncPtr handler) {
     dev->handler = handler;
     spi_enable_irq(dev);
 }
@@ -190,7 +197,6 @@ void spi_rx_dma_disable(spi_dev *dev) {
 /*
  * SPI auxiliary routines
  */
-
 static void spi_reconfigure(spi_dev *dev, uint32 cr1_config) {
     spi_irq_disable(dev, SPI_INTERRUPTS_ALL);
     spi_peripheral_disable(dev);

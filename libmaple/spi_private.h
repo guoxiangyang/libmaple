@@ -49,19 +49,9 @@
 
 
 static __always_inline void dispatch_general(spi_dev *dev) {
-    /* timer_gen_reg_map *regs = (dev->regs).gen; */
-    /* uint32 dsr = regs->DIER & regs->SR; */
-    /* void (**hs)(void) = dev->handlers; */
-    /* uint32 handled = 0; */
-
-    /* handle_irq(dsr, TIMER_SR_TIF,   hs, TIMER_TRG_INTERRUPT,    handled); */
-    /* handle_irq(dsr, TIMER_SR_CC4IF, hs, TIMER_CC4_INTERRUPT,    handled); */
-    /* handle_irq(dsr, TIMER_SR_CC3IF, hs, TIMER_CC3_INTERRUPT,    handled); */
-    /* handle_irq(dsr, TIMER_SR_CC2IF, hs, TIMER_CC2_INTERRUPT,    handled); */
-    /* handle_irq(dsr, TIMER_SR_CC1IF, hs, TIMER_CC1_INTERRUPT,    handled); */
-    /* handle_irq(dsr, TIMER_SR_UIF,   hs, TIMER_UPDATE_INTERRUPT, handled); */
-
-    /* regs->SR &= ~handled; */
+    if (dev->handler) {
+        dev->handler();
+    }
 }
 
 
